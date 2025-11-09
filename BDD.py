@@ -53,6 +53,13 @@ def buildRR2star(RR2):
             break
     return RR2star
 
+def verify(RR2STAR, PRIME, EVEN):
+    prime_to_even = PRIME.smoothing(x) & EVEN.smoothing(y) & RR2STAR
+
+    verifacation_result = prime_to_even.is_one()
+
+    return verifacation_result
+
 def num_to_dict(num, var_list):
     bits = [(num >> i) & 1 for i in reversed(range(len(var_list)))]
     return {var_list[i]: bits[i] for i in range(len(var_list))}
@@ -119,11 +126,9 @@ if __name__ == '__main__':
 
     RR2STAR= buildRR2star(RR2)
 
-    val1 = num_to_dict(27, x)
-    val2 = num_to_dict(9, y)
-    val1.update(val2)
-    print(bool(RR2.restrict(val1)))
-    print(bool(RR2STAR.restrict(val1)))
-
     testFunctions()
+
+    result = verify(RR2STAR, PRIME, EVEN)
+
+    print(f"The statement: For all u if u is PRIME then there exists a v such that V is EVEN and ucan reach v via RR2STAR is{result}")
 
