@@ -1,5 +1,19 @@
+from collections import MutableMapping, Sequence
 from pyeda.inter import *
 
+def equal_bits(a_bits, b_bits):
+    assert len(a_bits) == len(b_bits)
+    terms = []
+    for a, b in zip(a_bits, b_bits):
+        if isinstance(b, int):
+            terms.append(a if b == 1 else ~a)
+        else:
+            terms.append(~(a^b))
+    return And(*terms)
+
+
+def int_to_bits(num, width=5):
+    return [(num >> i) & 1 for i in reversed(range(width))]
 
 
 def make_R_expr(x,y):
@@ -12,7 +26,7 @@ def make_R_expr(x,y):
 def E_j(*bits, num):
     bitlist = int_to_bits(num, len(bits))
     terms = []
-    for b, bt_var in zip(bitlis, bits):
+    for b, bit_var in zip(bitlist, bits):
         terms.append(bit_var if b == 1 else ~bit_var)
     return And(*terms)
 
@@ -58,7 +72,7 @@ def testFunctions():
 
     print("Testing EVEN:\n")
     print(f"EVEN(14); Epected: True; Actual: {testEVEN(14)}\n")
-    print(f"EVEN(13); Epected: False; Actual: {testEVEN(14)}\n")
+    print(f"EVEN(13); Epected: False; Actual: {testEVEN(13)}\n")
 
     print("Testing PRIME:\n")
     print(f"PRIME(7); Epected: True; Actual: {testPRIME(7)}\n")
@@ -70,9 +84,9 @@ def testFunctions():
 
 
 if __name__ == '__main__':
-    x = exprvars('x', 5) 
-    y = exprvars('y', 5)
-    z = exprvars('z', 5)
+    x = bddvars('x', 5) 
+    y = bddvars('y', 5)
+    z = bddvars('z', 5)
 
     RR = expr2bdd(make_R_expr(x,y))
     PRIME = expr2bdd(build_prime(*x))
