@@ -1,4 +1,4 @@
-from collections import MutableMapping, Sequence
+#from collections import MutableMapping, Sequence
 from pyeda.inter import *
 
 def equal_bits(a_bits, b_bits):
@@ -40,9 +40,9 @@ def build_even(*y):
     even_exprs = [E_j(*y, num=j) for j in even]
     return Or(*even_exprs)
 
-def num_to_dict(num, var):
-    binary_format = "{:05b}".format(num)
-    return {var[i]: int(bit) for i, bit in enumerate(binary_format)}
+def num_to_dict(num, var_list):
+    bits = [(num >> i) & 1 for i in reversed(range(len(var_list)))]
+    return {var_list[i]: bits[i] for i in range(len(var_list))}
 
 def testEVEN(num):
     val = num_to_dict(num, y)
@@ -88,11 +88,15 @@ if __name__ == '__main__':
     y = bddvars('y', 5)
     z = bddvars('z', 5)
 
-    RR = expr2bdd(make_R_expr(x,y))
-    PRIME = expr2bdd(build_prime(*x))
-    EVEN = expr2bdd(build_even(*y))
+    RR = make_R_expr(x,y)
+    PRIME = build_prime(*x)
+    EVEN = build_even(*y)
 
-    RR2 = (RR.compose({y[i]: z[i] for i in range(5)}) and RR.compose({x[i]: z[i] for i in range(5)})).smoothing(z)
+    #RR2 = (RR.compose({y[i]: z[i] for i in range(5)}) and RR.compose({x[i]: z[i] for i in range(5)})).smoothing(z)
+
+    val = num_to_dict(7, x)
+    print(val)
+    print(list(val.keys())[0], type(list(val.keys())[0]))
 
     testFunctions()
 
