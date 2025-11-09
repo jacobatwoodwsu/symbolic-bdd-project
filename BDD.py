@@ -16,7 +16,7 @@ def int_to_bits(num, width=5):
 
 
 def make_R_expr(x,y):
-    R_expr = []
+    R_expr = 0
     for i in range(32):
         for j in [(i+3) % 32, (i + 8) % 32]:
             R_expr |= equal_bits(x, int_to_bits(i)) & equal_bits(y, int_to_bits(j))
@@ -43,13 +43,14 @@ def build_even(*y):
         even_exprs |= E_j(*y, num=e)
     return even_exprs
 
-def buildRR2star(x, y, z, RR2):
+def buildRR2star(RR2):
     RR2star = RR2
     prev = None
-    while RR2star != prev:
+    while True:
         prev = RR2star
-        step = (RR2star.compose({y[i]: z[i] for i in range(len(z))}) & RR2.compose({x[i]: z[i] for i in range(len(z))})).smoothing(z)
-        RR2star |= step
+        RR2star = prev | RR2
+        if RR2star.equivalent(prev):
+            break
     return RR2star
 
 def num_to_dict(num, var_list):
@@ -102,7 +103,7 @@ def testFunctions():
 
     print("Testing RR2Star:\n")
     print(f"RR2STAR(27, 6); Epected: True; Actual: {testRR2star(27, 6)}\n")
-    print(f"RR2STAR(27, 9); Epected: False; Actual: {testRR2star(27, 9)}\n")
+    print(f"RR2STAR(16, 20); Epected: False; Actual: {testRR2star(16, 20)}\n")
 
 
 if __name__ == '__main__':
@@ -116,7 +117,13 @@ if __name__ == '__main__':
 
     RR2 = (RR.compose({y[i]: z[i] for i in range(5)}) & RR.compose({x[i]: z[i] for i in range(5)})).smoothing(z)
 
-    RR2STAR= buildRR2star(x, y, z, RR2)
+    RR2STAR= buildRR2star(RR2)
+
+    val1 = num_to_dict(27, x)
+    val2 = num_to_dict(9, y)
+    val1.update(val2)
+    print(bool(RR2.restrict(val1)))
+    print(bool(RR2STAR.restrict(val1)))
 
     testFunctions()
 
